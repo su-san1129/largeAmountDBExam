@@ -73,5 +73,17 @@ public class ItemService {
 			return itemRepository.findByNameAndCategoryAndBrand(category.getName(), category.getGrandChildCategory(), category.getBrand());
 		}
 	}
+	
+	public List<Item> searchParentCategory(int on, Integer id){
+		if(on == 1) {
+			return itemRepository.findByNameAndParentCategoryAndBrand("", id, "");
+		} else if ( on == 2) {
+			return itemRepository.findByNameAndChildCategoryAndBrand("", id, "");
+		} else if ( on == 3) {
+			return itemRepository.findByNameAndCategoryAndBrand("", id, "");
+		} else {
+			return null;
+		}
+	}
 
 }

@@ -47,10 +47,17 @@ public class ItemController {
 		model.addAttribute("fizzySearchCategory", category);
 		model.addAttribute("itemList", itemService.fizzySearchItems(category));
 		model.addAttribute("parentCategories", itemService.showParentCategory());
-		if (category.getParent() != 0) 
+		if (category.getParent() != 0)
 			model.addAttribute("childCategories", itemService.showCategory(form.getParseIndparent()));
 		if (category.getChildCategory() != 0)
 			model.addAttribute("grandChildCategories", itemService.showCategory(form.getParseIntChildCategoryId()));
+		return "list";
+	}
+
+	@RequestMapping("/category")
+	public String searchCategory(Model model, int on, Integer id) {
+		model.addAttribute("itemList", itemService.searchParentCategory(on, id));
+		model.addAttribute("parentCategories", itemService.showParentCategory());
 		return "list";
 	}
 

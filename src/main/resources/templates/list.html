@@ -50,6 +50,7 @@
       <a class="btn btn-default" href="./add.html"><i class="fa fa-plus-square-o"></i> Add New Item</a>
     </div>
 
+    <div th:text="${fizzySearchCategory}"></div>
     <!-- 検索フォーム -->
     <div id="forms">
       <form action="#" th:action="@{/itemSearch}" id="category-form" class="form-inline" role="form">
@@ -59,7 +60,6 @@
           <input th:unless="${fizzySearchCategory}" type="input" class="form-control" id="name" name="name" placeholder="item name"
             />
         </div>
-        <div th:text="${fizzySearchCategory}"></div>
         <div class="form-group"><i class="fa fa-plus"></i></div>
         <div class="form-group">
           <select id="big-category" class="form-control" name="parent">
@@ -137,11 +137,11 @@
             <td class="item-price"><span th:text="${ item.price }">52.0</span></td>
             <td class="item-category">
               <div th:if="${item.category}">
-                <a th:href="@{ '/category?id=' + ${ item.category.parentCategory.parentCategory.id } }"><span
+                <a th:href="@{ '/category?on=1&id=' + ${ item.category.parentCategory.parentCategory.id } }"><span
                     th:text="${item.category.parentCategory.parentCategory.name}">Electronics</span></a> /
-                <a th:href="@{ '/category?id=' + ${ item.category.parentCategory.id } }"><span
+                <a th:href="@{ '/category?on=2&id=' + ${ item.category.parentCategory.id } }"><span
                     th:text="${ item.category.parentCategory.name }">Components &amp; Parts</span></a> /
-                <a th:href="@{ '/category?id=' + ${ item.category.id } }"><span
+                <a th:href="@{ '/category?on=3&id=' + ${ item.category.id } }"><span
                     th:text="${item.category.name}">Components &amp; Parts</span></a>
               </div>
             </td>
