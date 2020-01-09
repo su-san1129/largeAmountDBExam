@@ -11,17 +11,17 @@
     </div>
     <div id="navbar" class="collapse navbar-collapse">
       <div>
-        <ul class="nav navbar-nav navbar-right">
+        <ul sec:authorize="hasRole('ROLE_USER')" class="nav navbar-nav navbar-right">
           <li><a id="logout" href="#">Logout <i class="fa fa-sign-out"></i></a></li>
         </ul>
-        <ul class="nav navbar-nav navbar-right">
+        <ul sec:authorize="isAnonymous()" class="nav navbar-nav navbar-right">
           <li><a id="login" href="./login.html" th:href="@{/login}">Login <i class="fa fa-sign-in"></i></a></li>
         </ul>
-        <ul class="nav navbar-nav navbar-right">
+        <ul sec:authorize="isAnonymous()" class="nav navbar-nav navbar-right">
           <li><a id="signup" href="./register.html" th:href="@{/register}">Sign Up <i class="fa fa-user-plus"></i></a></li>
         </ul>
-        <p class="navbar-text navbar-right">
-          <span id="loginName">user: userName</span>
+        <p sec:authorize="hasRole('ROLE_USER')" class="navbar-text navbar-right">
+         user: <span id="loginName" sec:authentication="principal.user.name">userName</span>
         </p>
       </div>
     </div>
