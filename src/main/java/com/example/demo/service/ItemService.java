@@ -2,12 +2,14 @@ package com.example.demo.service;
 
 import java.util.List;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.Category;
 import com.example.demo.domain.Item;
 import com.example.demo.domain.fizzySearchCategory;
+import com.example.demo.form.ItemForm;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.ItemRepository;
 
@@ -61,6 +63,17 @@ public class ItemService {
 
 	public Item showDetail(Integer id) {
 		return itemRepository.load(id);
+	}
+	
+	public void itemSave(ItemForm form) {
+		Item item = new Item();
+		BeanUtils.copyProperties(form, item);
+		if(form.getCategoryId().length() < 5) {
+			item.setCategoryId(Integer.parseInt(form.getCategoryId()));
+		} else {
+			item.setCategoryId(0);
+		}
+		itemRepository.save(item);
 	}
 
 	public List<Item> fizzySearchItems(fizzySearchCategory category, Integer viewSize, Integer pageIndex) {

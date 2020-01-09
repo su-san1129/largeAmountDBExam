@@ -1,11 +1,28 @@
-<html>
-
-<head>
-	<title>title</title>
-</head>
-
-<body>
-	It works!
-</body>
-
-</html>
+ <!-- navbar -->
+  <nav class="navbar navbar-inverse">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+        aria-expanded="false" aria-controls="navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="./list.html" th:href="@{/}">Rakus Items</a>
+    </div>
+    <div id="navbar" class="collapse navbar-collapse">
+      <div>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a id="logout" href="#">Logout <i class="fa fa-sign-out"></i></a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a id="login" href="./login.html" th:href="@{/login}">Login <i class="fa fa-sign-in"></i></a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a id="signup" href="./register.html" th:href="@{/register}">Sign Up <i class="fa fa-user-plus"></i></a></li>
+        </ul>
+        <p class="navbar-text navbar-right">
+          <span id="loginName">user: userName</span>
+        </p>
+      </div>
+    </div>
+  </nav>

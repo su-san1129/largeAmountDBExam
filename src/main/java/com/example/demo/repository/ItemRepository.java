@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -48,6 +49,27 @@ public class ItemRepository {
 		}
 	}
 	
+	public void save(Item item) {
+		SqlParameterSource param = new BeanPropertySqlParameterSource(item);
+		if (item.getId() == null) {
+			String sql = "INSERT INTO items (name, condition, category, brand, price, shipping, description) VALUES (:name, :condition, :categoryId, :brand, :price, :shipping, :description)";
+			template.update(sql, param);
+		} else {
+			String sql = "UPDATE items SET name=:name, category=:categoryId, brand=:brand, price=:price, shipping=:shipping, description=:description WHERE id=:id;";
+			template.update(sql, param);
+		}
+	}
+	
+	/**
+	 * 商品名、カテゴリー名、ブランド名にて絞り込まれた商品情報.
+	 * 
+	 * @param name 商品名
+	 * @param categoryId カテゴリーId
+	 * @param brand ブランド名
+	 * @param viewSize 商品の表示件数
+	 * @param pageIndex ページのインデックス
+	 * @return
+	 */
 	public List<Item> findByNameAndCategoryAndBrand(String name, Integer categoryId, String brand, Integer viewSize, Integer pageIndex){
 		String sql = "SELECT "
 				     + "id"
@@ -71,6 +93,24 @@ public class ItemRepository {
 				.addValue("viewSize", viewSize)
 				.addValue("pageIndex", pageIndex);
 		return template.query(sql, param, ITEM_ROW_MAPPER);
+	}
+	
+	/**
+	 * 以下、パラメーターでの検索時のカウント数.
+	 * 
+	 * @param name 商品名
+	 * @param categoryId カテゴリー名
+	 * @param brand ブランド名
+	 * @return 商品件数
+	 */
+	public Integer countOfSearchByNameAndCategoryAndBrand(String name, Integer categoryId, String brand) {
+		try {
+			String sql = "SELECT count(*) FROM items WHERE name ILIKE :name AND category = :category AND brand ILIKE :brand";
+			SqlParameterSource param = new MapSqlParameterSource().addValue("name", "%"+name+"%");
+			return template.queryForObject(sql, param, Integer.class);
+		}catch (Exception e) {
+			return 0;
+		}
 	}
 	
 	public List<Item> findByNameAndBrand(String name, String brand, Integer viewSize, Integer pageIndex){
