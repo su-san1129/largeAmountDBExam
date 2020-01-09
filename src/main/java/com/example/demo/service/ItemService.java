@@ -20,23 +20,24 @@ public class ItemService {
 	@Autowired
 	private CategoryRepository categoryRepository;
 
-	public List<Item> itemList() {
-		return itemRepository.findAll();
-	}
-
 	public Integer pageList(Integer viewSize) {
 		Integer count = itemRepository.itemCount();
 		return (count / viewSize) + 1;
 	}
 
 	public List<Item> pagingItemList(Integer viewSize, Integer pageIndex) {
+		pageIndex = setPageIndex(viewSize, pageIndex);
+		List<Item> itemList = itemRepository.findByPage(viewSize, pageIndex);
+		return itemList;
+	}
+	
+	private Integer setPageIndex(Integer viewSize, Integer pageIndex) {
 		if (pageIndex * viewSize - (viewSize + 1) < 0) {
 			pageIndex = 0;
 		} else {
 			pageIndex = pageIndex * viewSize - (viewSize + 1);
 		}
-		List<Item> itemList = itemRepository.findByPage(viewSize, pageIndex);
-		return itemList;
+		return pageIndex;
 	}
 
 	/**
@@ -62,25 +63,27 @@ public class ItemService {
 		return itemRepository.load(id);
 	}
 
-	public List<Item> fizzySearchItems(fizzySearchCategory category) {
-		if (category.getParent() == 0) {
-			return itemRepository.findByNameAndBrand(category.getName(), category.getBrand());
-		} else if (category.getChildCategory() == 0) {
-			return itemRepository.findByNameAndParentCategoryAndBrand(category.getName(), category.getParent(), category.getBrand());
+	public List<Item> fizzySearchItems(fizzySearchCategory category, Integer viewSize, Integer pageIndex) {
+		pageIndex = setPageIndex(viewSize, pageIndex);
+		if (category.getParent() == 0) { // 検索欄に、大カテゴリーが入っていない時
+			return itemRepository.findByNameAndBrand(category.getName(), category.getBrand(), viewSize, pageIndex);
+		} else if (category.getChildCategory() == 0) { // 検索欄
+			return itemRepository.findByNameAndParentCategoryAndBrand(category.getName(), category.getParent(), category.getBrand(), viewSize, pageIndex);
 		} else if (category.getGrandChildCategory() == 0) {
-			return itemRepository.findByNameAndChildCategoryAndBrand(category.getName(), category.getChildCategory(), category.getBrand());
+			return itemRepository.findByNameAndChildCategoryAndBrand(category.getName(), category.getChildCategory(), category.getBrand(), viewSize, pageIndex);
 		} else {
-			return itemRepository.findByNameAndCategoryAndBrand(category.getName(), category.getGrandChildCategory(), category.getBrand());
+			return itemRepository.findByNameAndCategoryAndBrand(category.getName(), category.getGrandChildCategory(), category.getBrand(), viewSize, pageIndex);
 		}
 	}
 	
-	public List<Item> searchParentCategory(int on, Integer id){
+	public List<Item> searchParentCategory(int on, Integer id, Integer viewSize, Integer pageIndex){
+		pageIndex = setPageIndex(viewSize, pageIndex);
 		if(on == 1) {
-			return itemRepository.findByNameAndParentCategoryAndBrand("", id, "");
+			return itemRepository.findByNameAndParentCategoryAndBrand("", id, "", viewSize, pageIndex);
 		} else if ( on == 2) {
-			return itemRepository.findByNameAndChildCategoryAndBrand("", id, "");
+			return itemRepository.findByNameAndChildCategoryAndBrand("", id, "", viewSize, pageIndex);
 		} else if ( on == 3) {
-			return itemRepository.findByNameAndCategoryAndBrand("", id, "");
+			return itemRepository.findByNameAndCategoryAndBrand("", id, "", viewSize, pageIndex);
 		} else {
 			return null;
 		}

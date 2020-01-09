@@ -38,11 +38,6 @@ public class ItemRepository {
 		return item;
 	};
 	
-	public List<Item> findAll(){
-		String sql = "SELECT id, name, condition, category, brand, price, shipping, description FROM items ORDER BY price;";
-		return template.query(sql, ITEM_ROW_MAPPER);
-	}
-	
 	public Item load(Integer id) {
 		try {
 			String sql = "SELECT id, name, condition, category, brand, price, shipping, description FROM items WHERE id = :id";
@@ -53,7 +48,7 @@ public class ItemRepository {
 		}
 	}
 	
-	public List<Item> findByNameAndCategoryAndBrand(String name, Integer categoryId, String brand){
+	public List<Item> findByNameAndCategoryAndBrand(String name, Integer categoryId, String brand, Integer viewSize, Integer pageIndex){
 		String sql = "SELECT "
 				     + "id"
 				     + ", name"
@@ -67,21 +62,24 @@ public class ItemRepository {
 				     + "WHERE name ILIKE :name "
 				     + "AND category = :category "
 				     + "AND brand ILIKE :brand "
-				     + "ORDER BY price";
+				     + "ORDER BY price "
+				     + "LIMIT :viewSize OFFSET :pageIndex";
 		SqlParameterSource param = new MapSqlParameterSource()
 				.addValue("name", "%"+name+"%")
 				.addValue("category", categoryId)
-				.addValue("brand", "%"+brand+"%");
+				.addValue("brand", "%"+brand+"%")
+				.addValue("viewSize", viewSize)
+				.addValue("pageIndex", pageIndex);
 		return template.query(sql, param, ITEM_ROW_MAPPER);
 	}
 	
-	public List<Item> findByNameAndBrand(String name, String brand){
-		String sql = "SELECT id, name, condition, category, brand, price, shipping, description FROM items WHERE brand ILIKE :brand AND name ILIKE :name ORDER BY price;";
-		SqlParameterSource param = new MapSqlParameterSource().addValue("brand", "%"+brand+"%").addValue("name", name);
+	public List<Item> findByNameAndBrand(String name, String brand, Integer viewSize, Integer pageIndex){
+		String sql = "SELECT id, name, condition, category, brand, price, shipping, description FROM items WHERE brand ILIKE :brand AND name ILIKE :name ORDER BY price LIMIT :viewSize OFFSET :pageIndex;";
+		SqlParameterSource param = new MapSqlParameterSource().addValue("brand", "%"+brand+"%").addValue("name", "%"+name+"%").addValue("viewSize", viewSize).addValue("pageIndex", pageIndex);
 		return template.query(sql, param, ITEM_ROW_MAPPER);
 	}
 	
-	public List<Item> findByNameAndParentCategoryAndBrand(String name, Integer parentId, String brand){
+	public List<Item> findByNameAndParentCategoryAndBrand(String name, Integer parentId, String brand, Integer viewSize, Integer pageIndex){
 		String sql = "SELECT " 
 				   + "id"
 				   + ", name"
@@ -108,15 +106,17 @@ public class ItemRepository {
 				                 + "WHERE c1.id = :id"
 				                 + ") "
 				   + "ORDER BY price "
-				   + "LIMIT 30";
+				   + "LIMIT :viewSize OFFSET :pageIndex";
 		SqlParameterSource param = new MapSqlParameterSource()
 				.addValue("id", parentId)
 				.addValue("name", "%"+name+"%")
-				.addValue("brand", "%"+brand+"%");
+				.addValue("brand", "%"+brand+"%")
+				.addValue("viewSize", viewSize)
+				.addValue("pageIndex", pageIndex);
 		return template.query(sql, param, ITEM_ROW_MAPPER);
 		
 	}
-	public List<Item> findByNameAndChildCategoryAndBrand(String name, Integer parentId, String brand){
+	public List<Item> findByNameAndChildCategoryAndBrand(String name, Integer parentId, String brand, Integer viewSize, Integer pageIndex){
 		String sql = "SELECT " 
 				+ "id"
 				+ ", name"
@@ -141,11 +141,13 @@ public class ItemRepository {
 				+ "WHERE c1.id = :id"
 				+ ") "
 				+ "ORDER BY price "
-				+ "LIMIT 30";
+				+ "LIMIT :viewSize OFFSET :pageIndex";
 		SqlParameterSource param = new MapSqlParameterSource()
 				.addValue("id", parentId)
 				.addValue("name", "%"+name+"%")
-				.addValue("brand", "%"+brand+"%");
+				.addValue("brand", "%"+brand+"%")
+				.addValue("viewSize", viewSize)
+				.addValue("pageIndex", pageIndex);
 		return template.query(sql, param, ITEM_ROW_MAPPER);
 		
 	}

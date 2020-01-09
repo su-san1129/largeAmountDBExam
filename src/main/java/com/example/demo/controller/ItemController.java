@@ -31,6 +31,7 @@ public class ItemController {
 		if (page == null || page == 0)
 			page = 1;
 		Integer maxPage = itemService.pageList(viewSize);
+		model.addAttribute("pageStatus", 1);
 		model.addAttribute("maxPage", maxPage);
 		List<Item> itemList = itemService.pagingItemList(viewSize, page);
 		model.addAttribute("itemList", itemList);
@@ -40,12 +41,19 @@ public class ItemController {
 	}
 
 	@RequestMapping("/itemSearch")
-	public String fizzySearch(Model model, CategoryForm form) {
-
+	public String fizzySearch(Model model, CategoryForm form, Integer viewSize, Integer page) {
+		if (viewSize == null)
+			viewSize = 30;
+		if (page == null || page == 0)
+			page = 1;
+		Integer maxPage = itemService.pageList(viewSize);
+		model.addAttribute("maxPage", maxPage);
+		model.addAttribute("page", page);
 		fizzySearchCategory category = setCategory(form);
 
+		model.addAttribute("pageStatus", 2);
 		model.addAttribute("fizzySearchCategory", category);
-		model.addAttribute("itemList", itemService.fizzySearchItems(category));
+		model.addAttribute("itemList", itemService.fizzySearchItems(category, viewSize, page));
 		model.addAttribute("parentCategories", itemService.showParentCategory());
 		if (category.getParent() != 0)
 			model.addAttribute("childCategories", itemService.showCategory(form.getParseIndparent()));
@@ -55,19 +63,42 @@ public class ItemController {
 	}
 
 	@RequestMapping("/category")
-	public String searchCategory(Model model, int on, Integer id) {
-		model.addAttribute("itemList", itemService.searchParentCategory(on, id));
+	public String searchCategory(Model model, int on, Integer id, Integer viewSize, Integer page) {
+		if (viewSize == null)
+			viewSize = 30;
+		if (page == null || page == 0)
+			page = 1;
+		Integer maxPage = itemService.pageList(viewSize);
+		model.addAttribute("on", on);
+		model.addAttribute("pageStatus", 3);
+		model.addAttribute("id", id);
+		model.addAttribute("maxPage", maxPage);
+		model.addAttribute("page", page);
+		model.addAttribute("itemList", itemService.searchParentCategory(on, id, viewSize, page));
 		model.addAttribute("parentCategories", itemService.showParentCategory());
 		return "list";
 	}
+	
+	@RequestMapping("/edit")
+	public String edit(Model model, Integer id) {
+		int conditionCount[] = {1,2,3};
+		Item item = itemService.showDetail(id);
+		model.addAttribute("item",item);
+		model.addAttribute("parentCategories", itemService.showParentCategory());
+		if(item.getCategoryId() != 0 && item.getCategory().getParent() != 0) {
+			model.addAttribute("childCategories", itemService.showCategory(item.getCategory().getParentCategory().getParent()));
+		}
+		if(item.getCategoryId() != 0) {
+			model.addAttribute("grandChildCategories", itemService.showCategory(item.getCategory().getParent()));
+		}
+		model.addAttribute("conditionCount", conditionCount);
+		return "edit";
+	}
 
 	private fizzySearchCategory setCategory(CategoryForm form) {
-
 		fizzySearchCategory category = new fizzySearchCategory();
-
 		category.setBrand(form.getBrand());
 		category.setName(form.getName());
-
 		if (form.getParent().length() < 5)
 			category.setParent(form.getParseIndparent());
 		if (form.getChildCategory().length() < 5)

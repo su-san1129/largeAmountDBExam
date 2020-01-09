@@ -55,29 +55,30 @@
     <div id="forms">
       <form action="#" th:action="@{/itemSearch}" id="category-form" class="form-inline" role="form">
         <div class="form-group">
-          <input th:if="${fizzySearchCategory}" type="input" class="form-control" id="name" name="name" placeholder="item name"
-            th:value="${ fizzySearchCategory.name }" />
-          <input th:unless="${fizzySearchCategory}" type="input" class="form-control" id="name" name="name" placeholder="item name"
-            />
+          <input th:if="${fizzySearchCategory}" type="input" class="form-control" id="name" name="name"
+            placeholder="item name" th:value="${ fizzySearchCategory.name }" />
+          <input th:unless="${fizzySearchCategory}" type="input" class="form-control" id="name" name="name"
+            placeholder="item name" />
         </div>
         <div class="form-group"><i class="fa fa-plus"></i></div>
         <div class="form-group">
           <select id="big-category" class="form-control" name="parent">
             <option>- parentCategory -</option>
-            <option th:if="${fizzySearchCategory}" th:each="parentCategory:${parentCategories}" th:text="${parentCategory.name}"
-              th:value="${parentCategory.id}" th:selected="${ fizzySearchCategory.parent == parentCategory.id }">
+            <option th:if="${fizzySearchCategory}" th:each="parentCategory:${parentCategories}"
+              th:text="${parentCategory.name}" th:value="${parentCategory.id}"
+              th:selected="${ fizzySearchCategory.parent == parentCategory.id }">
               parentCategory1
             </option>
-            <option th:unless="${fizzySearchCategory}" th:each="parentCategory:${parentCategories}" th:text="${parentCategory.name}"
-              th:value="${parentCategory.id}">
+            <option th:unless="${fizzySearchCategory}" th:each="parentCategory:${parentCategories}"
+              th:text="${parentCategory.name}" th:value="${parentCategory.id}">
               parentCategory1
             </option>
           </select>
           <select id="childCategory" class="form-control" name="childCategory">
             <option>- childCategory -</option>
             <option th:if="${fizzySearchCategory}" th:each="childCategory:${childCategories}"
-              th:selected="${ fizzySearchCategory.childCategory == childCategory.id }"
-              th:text="${ childCategory.name }" th:value="${childCategory.id}">
+              th:selected="${ fizzySearchCategory.childCategory == childCategory.id }" th:text="${ childCategory.name }"
+              th:value="${childCategory.id}">
             </option>
             <option th:unless="${fizzySearchCategory}" th:each="childCategory:${childCategories}"
               th:text="${ childCategory.name }" th:value="${childCategory.id}">
@@ -93,8 +94,9 @@
         </div>
         <div class="form-group"><i class="fa fa-plus"></i></div>
         <div class="form-group">
-          <input th:if="${fizzySearchCategory}" type="text" class="form-control" name="brand" placeholder="brand" th:value="${fizzySearchCategory.brand}" />
-          <input th:unless="${fizzySearchCategory}" type="text" class="form-control" name="brand" placeholder="brand"/>
+          <input th:if="${fizzySearchCategory}" type="text" class="form-control" name="brand" placeholder="brand"
+            th:value="${fizzySearchCategory.brand}" />
+          <input th:unless="${fizzySearchCategory}" type="text" class="form-control" name="brand" placeholder="brand" />
         </div>
         <div class="form-group"></div>
         <button type="submit" class="btn btn-default"><i class="fa fa-angle-double-right"></i> search</button>
@@ -103,11 +105,27 @@
 
     <!-- pagination -->
     <div class="pages">
-      <nav class="page-nav">
+      <nav id="navigation" class="page-nav">
         <ul class="pager">
-          <li class="previous" th:if="${ 1 < page }"><a href="#" th:href="@{'/?page='+ ${page - 1}}">&larr; prev</a>
+          <li class="previous" th:if="${ 1 < page && pageStatus == 1}"><a href="#"
+              th:href="@{'/?page='+ ${page - 1}}">&larr; prev</a>
           </li>
-          <li class="next" th:if="${ page < maxPage }"><a href="#" th:href="@{'/?page='+ ${page + 1}}">next &rarr;</a>
+          <li class="previous" th:if="${ 1 < page && pageStatus == 2}"><a href="#"
+              th:href="@{ '/itemSearch?name=' + ${ fizzySearchCategory.name } + '&parent=' + ${ fizzySearchCategory.parent } + '&childCategory=' + ${ fizzySearchCategory.childCategory } + '&grandChildCategory=' + ${ fizzySearchCategory.grandChildCategory } + '&brand=' + ${ fizzySearchCategory.brand } + '&page=' + ${page - 1}}">next
+              prev</a>
+          </li>
+          <li class="previous" th:if="${ 1 < page && pageStatus == 3}"><a href="#"
+              th:href="@{ '/category?on=' + ${ on } + '&page=' + ${page - 1} + '&id=' + ${id}}">
+              prev</a>
+          </li>
+          <li class="next" th:if="${ page < maxPage && pageStatus == 1}"><a href="#"
+              th:href="@{'/?page='+ ${page + 1}}">next &rarr;</a></li>
+          <li class="next" th:if="${ page < maxPage && pageStatus == 2}"><a href="#"
+              th:href="@{ '/itemSearch?name=' + ${ fizzySearchCategory.name } + '&parent=' + ${ fizzySearchCategory.parent } + '&childCategory=' + ${ fizzySearchCategory.childCategory } + '&grandChildCategory=' + ${ fizzySearchCategory.grandChildCategory } + '&brand=' + ${ fizzySearchCategory.brand } + '&page=' + ${page + 1}}">next
+              &rarr;</a></li>
+          <li class="next" th:if="${ page < maxPage && pageStatus == 3}"><a href="#"
+              th:href="@{ '/category?on=' + ${ on } + '&page=' + ${page + 1} + '&id=' + ${id}}">
+              next</a>
           </li>
         </ul>
       </nav>
@@ -128,7 +146,6 @@
         <tbody>
           <tr th:each="item : ${itemList}">
             <td class="item-name">
-              id:<span th:text="${item.id}"></span>
               <a href="./detail.html" th:href="@{ '/detail?id=' + ${item.id} }"><span th:text="${ item.name }">Razer
                   BlackWidow</span>
                 Chroma Keyboard
@@ -156,14 +173,32 @@
 
     <!-- pagination -->
     <div class="pages">
-      <nav class="page-nav">
-        <ul class="pager">
-          <li class="previous" th:if="${ 1 < page }"><a href="#" th:href="@{'/?page='+ ${page - 1}}">&larr; prev</a>
-          </li>
-          <li class="next" th:if="${ page < maxPage }"><a href="#" th:href="@{'/?page='+ ${page + 1}}">next &rarr;</a>
-          </li>
-        </ul>
-      </nav>
+      <div class="pages">
+        <nav class="page-nav">
+          <ul class="pager">
+            <li class="previous" th:if="${ 1 < page && pageStatus == 1}"><a href="#"
+                th:href="@{'/?page='+ ${page - 1}}">&larr; prev</a>
+            </li>
+            <li class="previous" th:if="${ 1 < page && pageStatus == 2}"><a href="#"
+                th:href="@{ '/itemSearch?name=' + ${ fizzySearchCategory.name } + '&parent=' + ${ fizzySearchCategory.parent } + '&childCategory=' + ${ fizzySearchCategory.childCategory } + '&grandChildCategory=' + ${ fizzySearchCategory.grandChildCategory } + '&brand=' + ${ fizzySearchCategory.brand } + '&page=' + ${page - 1}}">next
+                prev</a>
+            </li>
+            <li class="previous" th:if="${ 1 < page && pageStatus == 3}"><a href="#"
+                th:href="@{ '/category?on=' + ${ on } + '&page=' + ${page - 1} + '&id=' + ${id}}">
+                prev</a>
+            </li>
+            <li class="next" th:if="${ page < maxPage && pageStatus == 1}"><a href="#"
+                th:href="@{'/?page='+ ${page + 1}}">next &rarr;</a></li>
+            <li class="next" th:if="${ page < maxPage && pageStatus == 2}"><a href="#"
+                th:href="@{ '/itemSearch?name=' + ${ fizzySearchCategory.name } + '&parent=' + ${ fizzySearchCategory.parent } + '&childCategory=' + ${ fizzySearchCategory.childCategory } + '&grandChildCategory=' + ${ fizzySearchCategory.grandChildCategory } + '&brand=' + ${ fizzySearchCategory.brand } + '&page=' + ${page + 1}}">next
+                &rarr;</a></li>
+            <li class="next" th:if="${ page < maxPage && pageStatus == 3}"><a href="#"
+                th:href="@{ '/category?on=' + ${ on } + '&page=' + ${page + 1} + '&id=' + ${id}}">next
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
       <!-- ページ番号を指定して表示するフォーム -->
       <div id="select-page">
         <form class="form-inline">
@@ -182,61 +217,7 @@
       </div>
     </div>
   </div>
-  <script type="text/javascript">
-    $('#big-category').on('change', function () {
-      var grandChildHtml = '<select  id=\"grandChildCategory\" class=\"form-control\"><option>- grandChild -</option>'
-      var html = '<select  id=\"childCategory\" class=\"form-control\"><option>- childCategory -</option>'
-      if ($(this).val().length < 4) {
-        $.ajax({
-          type: "POST",
-          contentType: "application/json",
-          url: "/childCategory",
-          data: $(this).val()
-        }).done(function (data) {
-
-          for (var i in data) {
-            var h = '<option value=\"' + data[i].id + '\">' + data[i].name + '</option>';
-            html += h;
-
-          };
-          html += '</select>'
-          $('#childCategory').html(html);
-          $('#grandChildCategory').html(grandChildHtml)
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-        });
-      } else {
-        html += '</select>'
-        grandChildHtml += '</select>'
-        $('#childCategory').html(html);
-        $('#grandChildCategory').html(grandChildHtml);
-      }
-    });
-    $('#childCategory').on('change', function () {
-      var html = '<select  id=\"grandChildCategory\" class=\"form-control\"><option>- grandChild -</option>'
-      console.log($(this).val())
-      if ($(this).val().length < 5) {
-        $.ajax({
-          type: "POST",
-          contentType: "application/json",
-          url: "/childCategory",
-          data: $(this).val()
-        }).done(function (data) {
-          for (var i in data) {
-            var h = '<option value=\"' + data[i].id + '\">' + data[i].name + '</option>';
-            html += h;
-
-          };
-          html += '</select>'
-          $('#grandChildCategory').html(html);
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-        });
-      } else {
-        html += '</select>'
-        $('#grandChildCategory').html(html);
-      }
-    });
-
-  </script>
+  <script th:src="@{/js/itemCategorySearch.js}"></script>
 </body>
 
 </html>
